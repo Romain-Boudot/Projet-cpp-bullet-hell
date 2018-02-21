@@ -1,27 +1,43 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <iostream>
 
-void thread_aff(sf::RenderWindow window) {
+class Param {
+    public:
+        sf::RenderWindow *window;
+        sf::CircleShape *shape;
+};
 
-    while (window.isOpen()) {
+void thread_aff(Param param) {
+
+    sf::RenderWindow *window = param.window;
+    sf::CircleShape *shape = param.shape;
+
+    std::cout << "thread aff" << std::endl;
+
+    window->create(sf::VideoMode(500, 800), "SFML works!");
+
+    while (window->isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
-                window.close();
+                window->close();
         }
 
-        sf::Vector2i mouse_posi = sf::Mouse::getPosition(window);
+        sf::Vector2i mouse_posi = sf::Mouse::getPosition(*window);
         sf::Vector2f mouse_posf;
 
-        mouse_posf.x = ((int) mouse_posi.x) - shape.getRadius();
-        mouse_posf.y = ((int) mouse_posi.y) - shape.getRadius();
+        mouse_posf.x = ((int) mouse_posi.x) - shape->getRadius();
+        mouse_posf.y = ((int) mouse_posi.y) - shape->getRadius();
 
-        shape.setPosition(mouse_posf);
+        shape->setPosition(mouse_posf);
 
-        window.clear();
-        window.draw(shape);
-        window.display();
+        window->clear();
+        window->draw(*shape);
+        window->display();
+
+
     }
 
 }
@@ -33,8 +49,19 @@ int main() {
     sf::CircleShape shape(100.f,100);
     shape.setFillColor(sf::Color::Green);
 
-    sf::Thread thread1(&thread_aff, &window);
+    Param param;
+
+    param.shape = &shape;
+    param.window = &window;
+
+    std::cout << "main thread" << std::endl;
+
     
+
+    sf::Thread thread1(&thread_aff, param);
+    
+    thread1.launch();
+
     thread1.wait();
 
     return 0;
