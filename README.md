@@ -17,3 +17,5 @@ a certain pallier : boss
 - boss
 - options attaque joueur
 - options attaques des ennemis
+
+coucou
