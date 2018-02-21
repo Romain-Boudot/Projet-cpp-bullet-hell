@@ -1,14 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!");
-    window.setFramerateLimit(60); // framerate
-    sf::CircleShape shape(100.f,100);
-    shape.setFillColor(sf::Color::Green);
+void thread_aff(sf::RenderWindow window) {
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -28,6 +23,19 @@ int main()
         window.draw(shape);
         window.display();
     }
+
+}
+
+int main() {
+
+    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!");
+    window.setFramerateLimit(60); // framerate
+    sf::CircleShape shape(100.f,100);
+    shape.setFillColor(sf::Color::Green);
+
+    sf::Thread thread1(&thread_aff, &window);
+    
+    thread1.wait();
 
     return 0;
 }
