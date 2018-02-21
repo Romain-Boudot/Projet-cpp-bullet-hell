@@ -2,7 +2,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!");
     window.setFramerateLimit(60); // framerate
     sf::CircleShape shape(100.f,100);
     shape.setFillColor(sf::Color::Green);
@@ -21,7 +21,7 @@ int main()
 
         mouse_posf.x = ((int) mouse_posi.x) - shape.getRadius();
         mouse_posf.y = ((int) mouse_posi.y) - shape.getRadius();
-        
+
         shape.setPosition(mouse_posf);
 
         window.clear();
