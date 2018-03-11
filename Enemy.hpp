@@ -1,7 +1,7 @@
-#include <SFML/Graphics.hpp>
+/* #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <iostream>
-#include <vector>
+#include <vector> */
 
 class Enemy {
 

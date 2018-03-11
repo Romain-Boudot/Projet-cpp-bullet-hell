@@ -31,6 +31,11 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
         game->player_sprite.setPosition(mouse_posf);
 
+        system("clear");
+        std::cout << "pos player x :" << mouse_posi.x << std::endl;
+        std::cout << "pos player y :" << mouse_posi.y << std::endl;
+        std::cout << "nb enmey     :" << game->enemy.size() << std::endl;
+
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player_sprite);
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
