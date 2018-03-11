@@ -2,27 +2,19 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <vector>
-
-class Bullet_hell {
-    public:
-        int windowHeight;
-        int windowWidth;
-        sf::RenderWindow *window;
-        sf::CircleShape *player_sprite;
-};
+#include "Enemy.hpp"
+#include "Bullet_hell.hpp"
 
 void thread_aff(Bullet_hell *game) { // thread d'affichage
 
-    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!");
-    window.setFramerateLimit(60); // framerate
+    sf::RenderWindow window(sf::VideoMode(game->windowWidth, game->windowHeight), "Bullet Hell");
+    window.setFramerateLimit(game->framerate); // framerate
 
     game->window = &window;
-    sf::CircleShape *player_sprite = game->player_sprite;
 
-    window.setMouseCursorVisible(false);
+    window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
     while (window.isOpen()) {
-
         
         sf::Event event;
 
@@ -34,13 +26,18 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
         sf::Vector2i mouse_posi = sf::Mouse::getPosition(window);
         sf::Vector2f mouse_posf;
 
-        mouse_posf.x = ((int) mouse_posi.x) - player_sprite->getRadius();
-        mouse_posf.y = ((int) mouse_posi.y) - player_sprite->getRadius();
+        mouse_posf.x = ((int) mouse_posi.x) - game->player_sprite.getRadius();
+        mouse_posf.y = ((int) mouse_posi.y) - game->player_sprite.getRadius();
 
-        player_sprite->setPosition(mouse_posf);
+        game->player_sprite.setPosition(mouse_posf);
 
         window.clear(sf::Color(0, 0, 30, 200));
-        window.draw(*player_sprite);
+        window.draw(game->player_sprite);
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+            if (!game->enemy[cpt].isdead()) {
+                window.draw(game->enemy[cpt].enemy_circle);
+            }
+        }
         window.display();
 
     }
@@ -48,13 +45,8 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 }
 
 int main() {    
-    
-    sf::CircleShape player_sprite(5.f,100);
-    player_sprite.setFillColor(sf::Color::Green);
 
     Bullet_hell game;
-
-    game.player_sprite = &player_sprite;
 
     sf::Thread th_aff(&thread_aff, &game);
     
