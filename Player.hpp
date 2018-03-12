@@ -1,15 +1,20 @@
 /* #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <iostream>
-#include <vector> */
+#include <vector>
+#include <unistd.h> */
 
 class Player {
 
     public:
 
+        std::vector<Bullet> bullet_list;
         sf::CircleShape player_hit_box;
 
         Player();
+
+        void fire();
+
 };
 
 Player::Player() {
@@ -19,4 +24,14 @@ Player::Player() {
 
     this->player_hit_box = player_hit_box;
 
+}
+
+void Player::fire() {
+
+    sf::Vector2f pos(this->player_hit_box.getPosition());
+
+    Bullet bullet(pos.x, pos.y);
+
+    this->bullet_list.push_back(bullet);
+    
 }

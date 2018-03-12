@@ -2,7 +2,7 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <vector>
-#include "player.hpp"
+#include "Player.hpp"
 #include "Enemy.hpp" */
 
 class Bullet_hell {
@@ -16,15 +16,20 @@ class Bullet_hell {
         std::vector<Enemy> enemy; // tableau de class Enemy
         sf::RenderWindow *window; // fenetre de jeu
         sf::Vector2i mouse_posi;
+        sf::Text pauset;
 
         Bullet_hell();
 
         bool isEnded();
         void end();
+        void pause();
+        void resume();
+        bool isPaused();
 
     private:
 
         bool endb;
+        bool pauseb;
 
 };
 
@@ -34,6 +39,17 @@ Bullet_hell::Bullet_hell() {
     this->windowWidth = 500;
     this->framerate = 60;
     this->endb = false;
+
+    sf::Font font;
+    font.loadFromFile("Roboto-Regular.ttf");
+
+    sf::Text text("PAUSE", font);
+    text.setCharacterSize(25);
+    text.setStyle(sf::Text::Bold);
+    text.setColor(sf::Color::Red);
+    text.setPosition(230.f, 400.f);
+
+    this->pauset = text;
 
     Player player;
 
@@ -57,4 +73,16 @@ bool Bullet_hell::isEnded() {
 
 void Bullet_hell::end() {
     this->endb = true;
+}
+
+void Bullet_hell::pause() {
+    this->pauseb = true;
+}
+
+void Bullet_hell::resume() {
+    this->pauseb = false;
+}
+
+bool Bullet_hell::isPaused() {
+    return this->pauseb;
 }
