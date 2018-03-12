@@ -1,33 +1,84 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <iostream>
+#include <vector>
+#include <unistd.h>
+#include "Enemy.hpp"
+#include "Player.hpp"
+#include "Bullet_hell.hpp"
 
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(500, 800), "SFML works!");
-    window.setFramerateLimit(60); // framerate
-    sf::CircleShape shape(100.f,100);
-    shape.setFillColor(sf::Color::Green);
+void thread_aff(Bullet_hell *game) { // thread d'affichage
 
-    while (window.isOpen())
-    {
+    sf::RenderWindow window(sf::VideoMode(game->windowWidth, game->windowHeight), "Bullet Hell");
+    window.setFramerateLimit(game->framerate); // framerate
+
+    sf
+
+    game->window = &window;
+
+    window.setMouseCursorVisible(false); // pas de pointeur en jeu
+
+    while (window.isOpen()) {
+        
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
 
-        sf::Vector2i mouse_posi = sf::Mouse::getPosition(window);
-        sf::Vector2f mouse_posf;
+        game->mouse_posi = sf::Mouse::getPosition(window);
 
-        mouse_posf.x = ((int) mouse_posi.x) - shape.getRadius();
-        mouse_posf.y = ((int) mouse_posi.y) - shape.getRadius();
+        system("clear");
+        std::cout << "pos player x :" << game->mouse_posi.x << std::endl;
+        std::cout << "pos player y :" << game->mouse_posi.y << std::endl;
+        std::cout << "nb enmey     :" << game->enemy.size() << std::endl;
 
-        shape.setPosition(mouse_posf);
-
-        window.clear();
-        window.draw(shape);
+        window.clear(sf::Color(0, 0, 30, 200));
+        window.draw(game->player.player_hit_box);
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+            if (!game->enemy[cpt].isdead()) {
+                window.draw(game->enemy[cpt].enemy_circle);
+            }
+        }
         window.display();
+
     }
+
+    game->end();
+
+}
+
+void thread_player(Bullet_hell *game) {
+
+    sf::RenderWindow *window = game->window;
+    sf::Vector2f mouse_posf;
+
+    while(!game->isEnded()) {
+
+        mouse_posf.x = ((int) game->mouse_posi.x) - game->player.player_hit_box.getRadius();
+        mouse_posf.y = ((int) game->mouse_posi.y) - game->player.player_hit_box.getRadius();
+
+        game->player.player_hit_box.setPosition(mouse_posf);
+
+        game->player->fire();
+
+    }
+
+}
+
+int main() {    
+
+    Bullet_hell game;
+
+    sf::Thread th_aff(&thread_aff, &game);
+    sf::Thread th_player(&thread_player, &game);
+    
+    th_aff.launch();
+    th_player.launch();
+
+    th_aff.wait();
+    th_player.wait();
 
     return 0;
 }
