@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/Projet_cpp_bullet_hell.dir/main.cpp.o"
+  "CMakeFiles/Projet_cpp_bullet_hell.dir/menu/Menu.cpp.o"
   "Projet_cpp_bullet_hell.pdb"
   "Projet_cpp_bullet_hell"
 )

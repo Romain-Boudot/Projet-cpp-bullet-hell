@@ -150,6 +150,33 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/Projet_cpp_bullet_hell.dir/build.make CMakeFiles/Projet_cpp_bullet_hell.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+menu/Menu.o: menu/Menu.cpp.o
+
+.PHONY : menu/Menu.o
+
+# target to build an object file
+menu/Menu.cpp.o:
+	$(MAKE) -f CMakeFiles/Projet_cpp_bullet_hell.dir/build.make CMakeFiles/Projet_cpp_bullet_hell.dir/menu/Menu.cpp.o
+.PHONY : menu/Menu.cpp.o
+
+menu/Menu.i: menu/Menu.cpp.i
+
+.PHONY : menu/Menu.i
+
+# target to preprocess a source file
+menu/Menu.cpp.i:
+	$(MAKE) -f CMakeFiles/Projet_cpp_bullet_hell.dir/build.make CMakeFiles/Projet_cpp_bullet_hell.dir/menu/Menu.cpp.i
+.PHONY : menu/Menu.cpp.i
+
+menu/Menu.s: menu/Menu.cpp.s
+
+.PHONY : menu/Menu.s
+
+# target to generate assembly for a file
+menu/Menu.cpp.s:
+	$(MAKE) -f CMakeFiles/Projet_cpp_bullet_hell.dir/build.make CMakeFiles/Projet_cpp_bullet_hell.dir/menu/Menu.cpp.s
+.PHONY : menu/Menu.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +189,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... menu/Menu.o"
+	@echo "... menu/Menu.i"
+	@echo "... menu/Menu.s"
 .PHONY : help
 
 

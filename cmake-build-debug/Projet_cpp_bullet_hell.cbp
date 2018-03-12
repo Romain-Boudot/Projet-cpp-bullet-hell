@@ -108,6 +108,12 @@
 		<Unit filename="/var/www/Projet-cpp-bullet-hell/main.cpp">
 			<Option target="Projet_cpp_bullet_hell"/>
 		</Unit>
+		<Unit filename="/var/www/Projet-cpp-bullet-hell/menu/Menu.cpp">
+			<Option target="Projet_cpp_bullet_hell"/>
+		</Unit>
+		<Unit filename="/var/www/Projet-cpp-bullet-hell/menu/Menu.h">
+			<Option target="Projet_cpp_bullet_hell"/>
+		</Unit>
 		<Unit filename="/var/www/Projet-cpp-bullet-hell/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

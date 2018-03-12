@@ -11,4 +11,4 @@ add_executable(Projet_cpp_bullet_hell
         main.cpp
         Player.hpp
         README.md
-        Roboto-Regular.ttf)
+        Roboto-Regular.ttf menu/Menu.cpp menu/Menu.h)
