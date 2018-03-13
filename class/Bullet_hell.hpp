@@ -9,7 +9,9 @@ class Bullet_hell {
         std::vector<Enemy> enemy; // tableau de class Enemy
         sf::Vector2i mouse_posi;
 
-        std::vector<Game_event> events;
+        sf::Mutex mtx_event;
+
+        std::vector<int> events;
 
         Bullet_hell();
 
@@ -53,9 +55,9 @@ Bullet_hell::Bullet_hell() {
 
 void Bullet_hell::addEvent(int type) {
 
-    Game_event event(type);
+    //Game_event event(type);
 
-    this->events.push_back(event);
+    this->events.push_back(type);
 
 }
 

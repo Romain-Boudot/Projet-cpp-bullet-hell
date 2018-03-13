@@ -1,7 +1,7 @@
 int eventPull(Bullet_hell *game) {
 
     if (game->events.size() > 0) {
-        int event = game->events.front().type;
+        int event = game->events.front();
         game->events.erase(game->events.begin());
         return event;
     }

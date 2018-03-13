@@ -18,4 +18,14 @@ a certain pallier : boss
 - options attaque joueur
 - options attaques des ennemis
 
-coucou
+
+
+
+
+event : type :
+
+    10 = 1 tick
+
+    0 = right click
+    1 = press space
+    2 = release space
