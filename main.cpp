@@ -12,25 +12,6 @@
 #include "class/Bullet_hell.hpp"
 #include "include/functions.cpp"
 
-void thread_ticker(Bullet_hell *game) {
-
-    int game_clock = clock();
-    int time_tick;
-
-    while(!game->isEnded()) {
-
-        time_tick = floor(((double) (clock() - game_clock) / CLOCKS_PER_SEC) * 1000); // 1 sec = 10,000 UA
-
-        if (time_tick%2 == 0) {
-            //game->mtx_event.lock();
-            game->addEvent(0);
-            //game->mtx_event.unlock();
-        }
-
-    }
-
-}
-
 void thread_aff(Bullet_hell *game) { // thread d'affichage
 
     sf::RenderWindow window(sf::VideoMode(game->windowWidth, game->windowHeight), "Bullet Hell");
@@ -66,7 +47,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
         //std::cout << "nb enmey     : " << game->enemy.size() << std::endl;
         std::cout << "fire         : " << game->player.bullet_list.size() << std::endl;
         std::cout << "nb event     : " << game->events.size() << std::endl;
-        /* std::cout << "ticks        : " << game->time << std::endl; */
+        // std::cout << "ticks        : " << game->time << std::endl;
 
 
         window.clear(sf::Color(0, 0, 30, 200));
@@ -130,15 +111,12 @@ int main() {
 
     sf::Thread th_aff(&thread_aff, &game);
     sf::Thread th_player(&thread_player, &game);
-    //sf::Thread ticker(&thread_ticker, &game);
 
-    //ticker.launch();
     th_player.launch();
     th_aff.launch();
 
     th_aff.wait();
     th_player.wait();
-    //ticker.wait();
 
     return 0;
 }
