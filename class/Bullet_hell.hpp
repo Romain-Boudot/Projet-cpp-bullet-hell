@@ -10,6 +10,7 @@ class Bullet_hell {
         sf::Vector2i mouse_posi;
 
         sf::Mutex mtx_event;
+        sf::Mutex mtx_pos_player;
 
         std::vector<int> events;
 
@@ -33,7 +34,7 @@ Bullet_hell::Bullet_hell() {
 
     this->windowHeight = 800;
     this->windowWidth = 500;
-    this->framerate = 60;
+    this->framerate = 90;
     this->endb = false;
 
     Player player;

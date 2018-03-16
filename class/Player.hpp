@@ -24,7 +24,7 @@ void Player::fire() {
 
     sf::Vector2f pos(this->player_hit_box.getPosition());
 
-    Bullet bullet(pos.x, pos.y, 0.f, -0.1);
+    Bullet bullet(pos.x + 3.f, pos.y - 8.f, 0.f, -0.1);
 
     this->bullet_list.push_back(bullet);
     

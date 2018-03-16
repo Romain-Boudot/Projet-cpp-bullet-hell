@@ -18,7 +18,7 @@ class Bullet {
 
 Bullet::Bullet(float x, float y, float mx, float my) {
 
-    sf::Vector2f size(3.f, 6.f);
+    sf::Vector2f size(4.f, 6.f);
 
     sf::RectangleShape r(size);
     r.setPosition(x, y);
