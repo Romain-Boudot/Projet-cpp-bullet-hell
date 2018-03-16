@@ -4,6 +4,7 @@
 #include <vector>
 #include <math.h>
 #include <unistd.h>
+#include "class/Event.hpp"
 #include "class/Game_event.hpp"
 #include "class/Enemy.hpp"
 #include "class/Bullet.hpp"
@@ -35,19 +36,19 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Right) {
-                    game->addEvent(0);
+                    game->addEvent(0, 0);
                 }
             }
 
             if (event.type == sf::Event::KeyPressed){
                 if (event.key.code == sf::Keyboard::Space){
-                    game->addEvent(1);
+                    game->addEvent(0, 1);
                 }
             }
 
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::Space) {
-                    game->addEvent(2);
+                    game->addEvent(0, 2);
                 }
             }
 
@@ -95,88 +96,53 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
 }
 
-void tickcounter(sf::Clock *tick_clock, bool *fire_tick, int *cpt_fire_tick, bool *move_tick) {
-
-    if (*fire_tick == true) *fire_tick = false;
-    if (*move_tick == true) *move_tick = false;
-
-    if (tick_clock->getElapsedTime().asSeconds() >= 0.005) {
-
-        /* system("clear");
-        std::cout << "fire     : " << *fire_tick << std::endl;
-        std::cout << "move     : " << *move_tick << std::endl;
-        std::cout << "fire cpt : " << *cpt_fire_tick << std::endl; */
-
-        *cpt_fire_tick += 1;
-        *move_tick = true;
-        if (*cpt_fire_tick == 200) {
-            *cpt_fire_tick = 0;
-            *fire_tick = true;
-            tick_clock->restart();
-        }
-
-    }
-
-}
-
-void colision_check(sf::RectangleShape *bullet, sf::CircleShape *enemy) {
-
-}
-
 void thread_player(Bullet_hell *game) {
 
-    bool fire = false, fire_tick = false, move_tick = false;
-    int cpt_fire_tick = 0;
+    bool fire = false;
+    int event, ticks = 0;
     sf::Clock tick_clock;
+    std::vector<Event> events;
 
     while(!game->isEnded()) {
 
-        tickcounter(&tick_clock, &fire_tick, &cpt_fire_tick, &move_tick);
+        tickcounter(&tick_clock, &ticks);
 
         game->mtx_event.lock();
-        int event = eventPull(game);
+        eventPull(game, &events, 0);
         game->mtx_event.unlock();
-        if (event != -1) {
+
+        for (int cpt = 0; cpt < events.size(); cpt++) {
+
+            event = events[cpt].code;
+
             if (event == 1) {
                 fire = true;
             } else if (event == 2) {
                 fire = false;
             }
-        }
-
-        if (move_tick == true) {
-
-            move_bullet(game); // mouvement des bullet
-
-            for (int cpt_bullet = 0; cpt_bullet < game->player.bullet_list.size(); cpt_bullet++) {
-                for (int cpt_enemy = 0; cpt_enemy < game->enemy.size(); cpt_enemy++) {
-                    colision_check(), game->enemy[cpt_enemy]);
-                }
-            }
 
         }
+        
+        events.clear();
 
-        if (fire_tick == true && fire == true) {
+        if (ticks%200 == 0) {
             game->player.fire();
         }
 
         game->mtx_pos_player.lock();
         move(game); // mouvement du player
+        move_bullet(game); // mouvement des bullet
         game->mtx_pos_player.unlock();
 
     }
 
 }
 
-void thread_physics(Bullet_hell *game) {
+/* void thread_enemy(Bullet_hell *game) {
 
-    while(!game->isEnded()) {
 
-        
 
-    }
-
-}
+} */
 
 int main() {    
 
@@ -184,15 +150,15 @@ int main() {
 
     sf::Thread th_aff(&thread_aff, &game);
     sf::Thread th_player(&thread_player, &game);
-    sf::Thread th_physics(&thread_physics, &game);
+    //sf::Thread th_enemy(&thread_enemy, &game);
 
-    th_physics.launch();
     th_player.launch();
+    //th_enemy.launch();
     th_aff.launch();
 
     th_aff.wait();
+    //th_enemy.wait();
     th_player.wait();
-    th_physics.wait();
 
     return 0;
 }

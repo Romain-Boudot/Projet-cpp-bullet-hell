@@ -1,12 +1,24 @@
-int eventPull(Bullet_hell *game) {
+void tickcounter(sf::Clock *tick_clock, int *ticks) {
 
-    if (game->events.size() > 0) {
-        int event = game->events.front();
-        game->events.erase(game->events.begin());
-        return event;
+    while (tick_clock->getElapsedTime().asSeconds() <= 1.00005) { /* wait */ }
+
+    *ticks += 1;
+
+}
+
+
+void eventPull(Bullet_hell *game, std::vector<Event> *events, int eventPullType) {
+
+    for (int cpt = 0; cpt < game->events.size(); cpt++) {
+
+        if (game->events[cpt].type == eventPullType) {
+
+            events->push_back(game->events[cpt]);
+            game->events.erase(game->events.begin() + cpt);
+
+        }
+
     }
-
-    return -1;
 
 }
 
@@ -21,6 +33,7 @@ void move(Bullet_hell *game) {
     game->player.player_hit_box.setPosition(mouse_posf);
 
 }
+
 
 void move_bullet(Bullet_hell *game) {
 

@@ -8,11 +8,11 @@ class Bullet_hell {
         Player player; // class Player
         std::vector<Enemy> enemy; // tableau de class Enemy
         sf::Vector2i mouse_posi;
+        std::vector<Event> events;
 
         sf::Mutex mtx_event;
         sf::Mutex mtx_pos_player;
 
-        std::vector<int> events;
 
         Bullet_hell();
 
@@ -21,7 +21,7 @@ class Bullet_hell {
         void pause();
         void resume();
         bool isPaused();
-        void addEvent(int type);
+        void addEvent(int type, int code);
 
     private:
 
@@ -54,11 +54,11 @@ Bullet_hell::Bullet_hell() {
 }
 
 
-void Bullet_hell::addEvent(int type) {
+void Bullet_hell::addEvent(int type, int code) {
 
-    //Game_event event(type);
+    Event event(type, code);
 
-    this->events.push_back(type);
+    this->events.push_back(event);
 
 }
 
