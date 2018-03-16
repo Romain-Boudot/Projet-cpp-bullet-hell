@@ -45,11 +45,13 @@ Bullet_hell::Bullet_hell() {
     Enemy enemy2(250.f, 90.f);
     Enemy enemy3(220.f, 60.f);
     Enemy enemy4(280.f, 60.f);
+    Enemy2 enemy5(250.f, 40.f);
 
     this->enemy.push_back(enemy1);
     this->enemy.push_back(enemy2);
     this->enemy.push_back(enemy3);
     this->enemy.push_back(enemy4);
+    this->enemy.push_back(enemy5);
 
 }
 
