@@ -29,7 +29,7 @@ Enemy::Enemy(float x, float y, float mx, float my) {
     this->mouvement.y = my;
     this->enemy_circle = enemy;
     this->radiusHit = 10;
-    this->healthPTS = 50;
+    this->healthPTS = 30;
 
 }
 

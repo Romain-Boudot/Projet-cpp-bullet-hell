@@ -12,7 +12,8 @@ class Bullet_hell {
 
         sf::Mutex mtx_event;
         sf::Mutex mtx_pos_player;
-
+        sf::Mutex mtx_vect_enemy;
+        sf::Mutex mtx_vect_player_bullet;
 
         Bullet_hell();
 
@@ -39,7 +40,7 @@ Bullet_hell::Bullet_hell() {
     this->windowWidth = 500;
     this->framerate = 90;
     this->endb = false;
-    this->max_weight = 5;
+    this->max_weight = 10;
     this->dmgHit = 1;
 
     Player player;
@@ -96,7 +97,9 @@ int Bullet_hell::weight() {
 
 void Bullet_hell::killPlayerBullet(int indice) {
 
+    this->mtx_vect_player_bullet.lock();
     this->player.bullet_list.erase(this->player.bullet_list.begin() + indice);
+    this->mtx_vect_player_bullet.unlock();
 
 }
 
@@ -105,7 +108,9 @@ void Bullet_hell::hitEnemy(int indice) {
 
     if (this->enemy[indice].hit(this->dmgHit)) {
 
+        this->mtx_vect_enemy.lock();
         this->enemy.erase(this->enemy.begin() + indice);
+        this->mtx_vect_enemy.unlock();
 
     }
 

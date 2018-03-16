@@ -61,11 +61,11 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
         fps_tmp++;
 
-        if (fps_clock.getElapsedTime().asSeconds() >= 1) {
+        /*if (fps_clock.getElapsedTime().asSeconds() >= 1) {
             fps = fps_tmp;
             fps_tmp = 0;
             fps_clock.restart();
-        }
+        }*/
 
         //system("clear");
         //std::cout << "pos player x : " << game->mouse_posi.x << std::endl;
@@ -79,12 +79,19 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player.player_hit_box);
+
+        game->mtx_vect_enemy.lock();
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
             window.draw(game->enemy[cpt].enemy_circle);
         }
+        game->mtx_vect_enemy.unlock();
+
+        game->mtx_vect_player_bullet.lock();
         for (int cpt = 0; cpt < game->player.bullet_list.size(); cpt++) {
             window.draw(game->player.bullet_list[cpt].bullet_hit_box);
         }
+        game->mtx_vect_player_bullet.unlock();
+
         window.display();
 
     }
@@ -141,6 +148,9 @@ void thread_enemy(Bullet_hell *game) {
     sf::Clock tick_clock;
     sf::Clock random;
 
+    sf::Vector2f corectif_hit_box_enemy(-10.f, -10.f);
+    sf::Vector2f corectif_hit_box_bullet_player(-2.f, -3.f);
+
     while(!game->isEnded()) {
 
         tickcounter(&tick_clock, &ticks);
@@ -152,12 +162,12 @@ void thread_enemy(Bullet_hell *game) {
             if (game->enemy[cpt].enemy_circle.getPosition().y > 800) {
                 game->enemy.erase(game->enemy.begin() + cpt);
             }
-
+            
             for (int cpt1 = 0; cpt1 < game->player.bullet_list.size(); cpt1++) {
 
-                if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition(), 
+                if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition() + corectif_hit_box_enemy, 
                     game->player.bullet_list[cpt1].radiusHit, 
-                    game->enemy[cpt].enemy_circle.getPosition(), 
+                    game->enemy[cpt].enemy_circle.getPosition() + corectif_hit_box_bullet_player, 
                     game->enemy[cpt].radiusHit ))
                 {
                     game->hitEnemy(cpt);
@@ -168,15 +178,14 @@ void thread_enemy(Bullet_hell *game) {
 
         }
 
-        if (game->placesLeft() > 0) {
+        if (game->placesLeft() > 0 and ticks%200 == 0) {
 
-            pl = game->placesLeft();
-
-            for (int cpt = 0; cpt < pl; cpt++) {
-
-                game->addEnemy((random.getElapsedTime().asMilliseconds() * 1000)%500, 1.f, (random.getElapsedTime().asMilliseconds() * 1000)%100 / 100, 0.001);
-
-            }
+            game->addEnemy(
+                (int)(random.getElapsedTime().asSeconds() * 1000)%500,
+                1.f,
+                ((int)random.getElapsedTime().asSeconds() * 1000)%100 / 100,
+                0.05
+            );
 
         }
 
