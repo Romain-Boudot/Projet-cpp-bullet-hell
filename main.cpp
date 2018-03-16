@@ -36,7 +36,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Right) {
-                    game->addEvent(0, 0);
+                    game->addEvent(1, 0);
                 }
             }
 
@@ -67,26 +67,23 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
             fps_clock.restart();
         }
 
-        /* system("clear");
-        std::cout << "pos player x : " << game->mouse_posi.x << std::endl;
-        std::cout << "pos player y : " << game->mouse_posi.y << std::endl;
+        //system("clear");
+        //std::cout << "pos player x : " << game->mouse_posi.x << std::endl;
+        //std::cout << "pos player y : " << game->mouse_posi.y << std::endl;
         //std::cout << "nb enmey     : " << game->enemy.size() << std::endl;
-        std::cout << "fire         : " << game->player.bullet_list.size() << std::endl;
-        std::cout << "nb event     : " << game->events.size() << std::endl;
-        std::cout << "fps          : " << fps << std::endl;
-        // std::cout << "ticks        : " << game->time << std::endl; */
+        //std::cout << "nb free plcs : " << game->placesLeft() << std::endl;
+        //std::cout << "fire         : " << game->player.bullet_list.size() << std::endl;
+        //std::cout << "nb event     : " << game->events.size() << std::endl;
+        //std::cout << "fps          : " << fps << std::endl;
+        // std::cout << "ticks        : " << game->time << std::endl;
 
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player.player_hit_box);
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
-            if (!game->enemy[cpt].isdead()) {
-                window.draw(game->enemy[cpt].enemy_circle);
-            }
+            window.draw(game->enemy[cpt].enemy_circle);
         }
         for (int cpt = 0; cpt < game->player.bullet_list.size(); cpt++) {
-            if (!game->player.bullet_list[cpt].isDead()) {
-                window.draw(game->player.bullet_list[cpt].bullet_hit_box);
-            }
+            window.draw(game->player.bullet_list[cpt].bullet_hit_box);
         }
         window.display();
 
@@ -108,7 +105,7 @@ void thread_player(Bullet_hell *game) {
         tickcounter(&tick_clock, &ticks);
 
         game->mtx_event.lock();
-        eventPull(game, &events, 0);
+            eventPull(game, &events, 0);
         game->mtx_event.unlock();
 
         for (int cpt = 0; cpt < events.size(); cpt++) {
@@ -125,24 +122,70 @@ void thread_player(Bullet_hell *game) {
         
         events.clear();
 
-        if (ticks%200 == 0) {
+        if (ticks%200 == 0 && fire == true) {
             game->player.fire();
         }
 
         game->mtx_pos_player.lock();
-        move(game); // mouvement du player
-        move_bullet(game); // mouvement des bullet
+            move(game); // mouvement du player
+            move_bullet(game); // mouvement des bullet
         game->mtx_pos_player.unlock();
 
     }
 
 }
 
-/* void thread_enemy(Bullet_hell *game) {
+void thread_enemy(Bullet_hell *game) {
 
+    int event, ticks = 0, pl;
+    sf::Clock tick_clock;
+    sf::Clock random;
 
+    while(!game->isEnded()) {
 
-} */
+        tickcounter(&tick_clock, &ticks);
+
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+
+            game->enemy[cpt].move();
+            
+            if (game->enemy[cpt].enemy_circle.getPosition().y > 800) {
+                game->enemy.erase(game->enemy.begin() + cpt);
+            }
+
+            for (int cpt1 = 0; cpt1 < game->player.bullet_list.size(); cpt1++) {
+
+                if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition(), 
+                    game->player.bullet_list[cpt1].radiusHit, 
+                    game->enemy[cpt].enemy_circle.getPosition(), 
+                    game->enemy[cpt].radiusHit ))
+                {
+                    game->hitEnemy(cpt);
+                    game->killPlayerBullet(cpt1);
+                }
+
+            }
+
+        }
+
+        if (game->placesLeft() > 0) {
+
+            pl = game->placesLeft();
+
+            for (int cpt = 0; cpt < pl; cpt++) {
+
+                game->addEnemy((random.getElapsedTime().asMilliseconds() * 1000)%500, 1.f, (random.getElapsedTime().asMilliseconds() * 1000)%100 / 100, 0.001);
+
+            }
+
+        }
+
+        system("clear");
+        std::cout << "perf  : " << tick_clock.getElapsedTime().asSeconds() << std::endl;
+
+    }
+
+}
 
 int main() {    
 
@@ -150,15 +193,16 @@ int main() {
 
     sf::Thread th_aff(&thread_aff, &game);
     sf::Thread th_player(&thread_player, &game);
-    //sf::Thread th_enemy(&thread_enemy, &game);
+    sf::Thread th_enemy(&thread_enemy, &game);
 
     th_player.launch();
-    //th_enemy.launch();
+    th_enemy.launch();
     th_aff.launch();
 
     th_aff.wait();
-    //th_enemy.wait();
+    th_enemy.wait();
     th_player.wait();
 
     return 0;
+
 }

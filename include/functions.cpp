@@ -1,8 +1,10 @@
 void tickcounter(sf::Clock *tick_clock, int *ticks) {
 
-    while (tick_clock->getElapsedTime().asSeconds() <= 1.00005) { /* wait */ }
+    while (tick_clock->getElapsedTime().asSeconds() <= 0.00005) { /* wait */ }
 
     *ticks += 1;
+
+    tick_clock->restart();
 
 }
 
@@ -45,6 +47,16 @@ void move_bullet(Bullet_hell *game) {
             game->player.bullet_list.erase(game->player.bullet_list.begin() + cpt);
         }
 
+    }
+
+}
+
+bool collision(sf::Vector2f pos1, int rad1, sf::Vector2f pos2, int rad2) {
+
+    if (sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y)) <= rad1 + rad2) {
+        return true;
+    } else {
+        return false;
     }
 
 }

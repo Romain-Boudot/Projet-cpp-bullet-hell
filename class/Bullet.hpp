@@ -3,15 +3,14 @@ class Bullet {
     public:
 
         sf::RectangleShape bullet_hit_box;
+        int radiusHit;
 
         Bullet(float x, float y, float mx, float my);
 
-        bool isDead();
         void move();
 
     private:
 
-        bool dead;
         sf::Vector2f mouvement;
 
 };
@@ -26,14 +25,8 @@ Bullet::Bullet(float x, float y, float mx, float my) {
     this->bullet_hit_box = r;
     this->mouvement.x = mx;
     this->mouvement.y = my;
-    this->dead = false;
+    this->radiusHit = 4;
 
-}
-
-bool Bullet::isDead() {
-
-    return this->dead;
-    
 }
 
 void Bullet::move() {

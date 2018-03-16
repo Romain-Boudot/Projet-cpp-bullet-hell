@@ -4,6 +4,7 @@ class Player {
 
         std::vector<Bullet> bullet_list;
         sf::CircleShape player_hit_box;
+        int radiusHit;
 
         Player();
 
@@ -17,6 +18,7 @@ Player::Player() {
     player_hit_box.setFillColor(sf::Color::Green);
 
     this->player_hit_box = player_hit_box;
+    this->radiusHit = 5;
 
 }
 

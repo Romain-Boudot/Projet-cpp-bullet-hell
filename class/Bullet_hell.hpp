@@ -18,15 +18,18 @@ class Bullet_hell {
 
         bool isEnded();
         void end();
-        void pause();
-        void resume();
-        bool isPaused();
         void addEvent(int type, int code);
+        int  placesLeft();
+        void addEnemy(float x, float y, float mx, float my);
+        int  weight();
+        void killPlayerBullet(int indice);
+        void hitEnemy(int indice);
 
     private:
 
         bool endb;
-        bool pauseb;
+        int max_weight;
+        int dmgHit;
 
 };
 
@@ -36,20 +39,12 @@ Bullet_hell::Bullet_hell() {
     this->windowWidth = 500;
     this->framerate = 90;
     this->endb = false;
+    this->max_weight = 5;
+    this->dmgHit = 1;
 
     Player player;
 
     this->player = player;
-
-    Enemy enemy1(250.f, 60.f);
-    Enemy enemy2(250.f, 90.f);
-    Enemy enemy3(220.f, 60.f);
-    Enemy enemy4(280.f, 60.f);
-
-    this->enemy.push_back(enemy1);
-    this->enemy.push_back(enemy2);
-    this->enemy.push_back(enemy3);
-    this->enemy.push_back(enemy4);
 
 }
 
@@ -71,14 +66,47 @@ void Bullet_hell::end() {
     this->endb = true;
 }
 
-void Bullet_hell::pause() {
-    this->pauseb = true;
+int Bullet_hell::placesLeft() {
+    return (this->max_weight - this->weight());
 }
 
-void Bullet_hell::resume() {
-    this->pauseb = false;
+
+void Bullet_hell::addEnemy(float x, float y, float mx, float my) {
+
+    Enemy enemy(x, y, mx, my);
+
+    this->enemy.push_back(enemy);
+
 }
 
-bool Bullet_hell::isPaused() {
-    return this->pauseb;
+
+int Bullet_hell::weight() {
+
+    int weight = 0;
+
+    for (int cpt = 0; cpt < this->enemy.size(); cpt++) {
+
+        weight += this->enemy[cpt].weight;
+
+    }
+
+    return weight;
+
+}
+
+void Bullet_hell::killPlayerBullet(int indice) {
+
+    this->player.bullet_list.erase(this->player.bullet_list.begin() + indice);
+
+}
+
+
+void Bullet_hell::hitEnemy(int indice) {
+
+    if (this->enemy[indice].hit(this->dmgHit)) {
+
+        this->enemy.erase(this->enemy.begin() + indice);
+
+    }
+
 }
