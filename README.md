@@ -17,3 +17,15 @@ a certain pallier : boss
 - boss
 - options attaque joueur
 - options attaques des ennemis
+
+
+## todo
+
+- [ ] menu :
+ - [ ] option :
+  - [ ] manette :
+   - [ ] calibrage 
+   - [ ] choix des joystick de mouvement
+   - [ ] choix des boutons
+  - [ ] clavier :
+   - [ ] choix des boutons

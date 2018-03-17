@@ -5,6 +5,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "class/Event.hpp"
+#include "class/Controler.hpp"
 #include "class/Game_event.hpp"
 #include "class/Enemy.hpp"
 #include "class/Bullet.hpp"
@@ -16,9 +17,8 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
     sf::RenderWindow window(sf::VideoMode(game->windowWidth, game->windowHeight), "Bullet Hell");
     window.setFramerateLimit(game->framerate); // framerate
-    sf::Clock fps_clock;
-
-    float fps = 0, fps_tmp = 0;
+    //sf::Clock fps_clock;
+    //float fps = 0, fps_tmp = 0;
 
     window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
@@ -28,17 +28,11 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
         while (window.pollEvent(event)) {
 
-            game->mtx_event.lock();
-
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
 
-            if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Right) {
-                    game->addEvent(1, 0);
-                }
-            }
+            game->mtx_event.lock();
 
             if (event.type == sf::Event::KeyPressed){
                 if (event.key.code == sf::Keyboard::Space){
@@ -53,43 +47,62 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
             }
 
             game->mtx_event.unlock();
+            game->mtx_controler.lock();
+
+            if (event.type == sf::Event::MouseMoved) {
+                
+                if (game->controler.joy != 0) game->controler.joy = 0;
+
+                game->controler.mouse_posi.x = event.mouseMove.x;
+                game->controler.mouse_posi.y = event.mouseMove.y;
+
+            }
+
+            if (event.type == sf::Event::JoystickMoved) {
+
+                if (game->controler.joy != 1) game->controler.joy = 1;
+
+                if (event.joystickMove.axis == sf::Joystick::X) {
+                    game->controler.axisX = event.joystickMove.position;
+                } else if (event.joystickMove.axis == sf::Joystick::Y) {
+                    game->controler.axisY = event.joystickMove.position;
+                } else if (event.joystickMove.axis == sf::Joystick::R) {
+                    if (event.joystickMove.position < -95) {
+                        game->addEvent(0, 2);
+                    } else {
+                        game->addEvent(0, 1);
+                    }
+                }
+
+            }
+    
+            game->mtx_controler.unlock();
+            
         }
-
-        game->mtx_pos_player.lock();
-        game->mouse_posi = sf::Mouse::getPosition(window); // recuperation de la position de la souris
-        game->mtx_pos_player.unlock();
-
-        fps_tmp++;
-
-        /*if (fps_clock.getElapsedTime().asSeconds() >= 1) {
-            fps = fps_tmp;
-            fps_tmp = 0;
-            fps_clock.restart();
-        }*/
-
-        //system("clear");
-        //std::cout << "pos player x : " << game->mouse_posi.x << std::endl;
-        //std::cout << "pos player y : " << game->mouse_posi.y << std::endl;
-        //std::cout << "nb enmey     : " << game->enemy.size() << std::endl;
-        //std::cout << "nb free plcs : " << game->placesLeft() << std::endl;
-        //std::cout << "fire         : " << game->player.bullet_list.size() << std::endl;
-        //std::cout << "nb event     : " << game->events.size() << std::endl;
-        //std::cout << "fps          : " << fps << std::endl;
-        // std::cout << "ticks        : " << game->time << std::endl;
 
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player.player_hit_box);
 
+
         game->mtx_vect_enemy.lock();
+
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+
             window.draw(game->enemy[cpt].enemy_circle);
+
         }
+
         game->mtx_vect_enemy.unlock();
 
+
         game->mtx_vect_player_bullet.lock();
+
         for (int cpt = 0; cpt < game->player.bullet_list.size(); cpt++) {
+
             window.draw(game->player.bullet_list[cpt].bullet_hit_box);
+
         }
+
         game->mtx_vect_player_bullet.unlock();
 
         window.display();
@@ -104,6 +117,7 @@ void thread_player(Bullet_hell *game) {
 
     bool fire = false;
     int event, ticks = 0;
+    Controler controler;
     sf::Clock tick_clock;
     std::vector<Event> events;
 
@@ -117,11 +131,9 @@ void thread_player(Bullet_hell *game) {
 
         for (int cpt = 0; cpt < events.size(); cpt++) {
 
-            event = events[cpt].code;
-
-            if (event == 1) {
+            if (events[cpt].name == 1) {
                 fire = true;
-            } else if (event == 2) {
+            } else if (events[cpt].name == 2) {
                 fire = false;
             }
 
@@ -133,10 +145,10 @@ void thread_player(Bullet_hell *game) {
             game->player.fire();
         }
 
-        game->mtx_pos_player.lock();
+        game->mtx_controler.lock();
             move(game); // mouvement du player
             move_bullet(game); // mouvement des bullet
-        game->mtx_pos_player.unlock();
+        game->mtx_controler.unlock();
 
     }
 
@@ -184,13 +196,13 @@ void thread_enemy(Bullet_hell *game) {
                 (int)(random.getElapsedTime().asSeconds() * 1000)%500,
                 1.f,
                 ((int)random.getElapsedTime().asSeconds() * 1000)%100 / 100,
-                0.05
+                0.005f
             );
 
         }
 
-        system("clear");
-        std::cout << "perf  : " << tick_clock.getElapsedTime().asSeconds() << std::endl;
+        /* system("clear");
+        std::cout << "perf  : " << tick_clock.getElapsedTime().asSeconds() << std::endl; */
 
     }
 

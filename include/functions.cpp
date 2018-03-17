@@ -27,12 +27,25 @@ void eventPull(Bullet_hell *game, std::vector<Event> *events, int eventPullType)
 
 void move(Bullet_hell *game) {
 
-    sf::Vector2f mouse_posf;
+    if (game->controler.joy == false) {
 
-    mouse_posf.x = ((int) game->mouse_posi.x) - game->player.player_hit_box.getRadius();
-    mouse_posf.y = ((int) game->mouse_posi.y) - game->player.player_hit_box.getRadius();
+        sf::Vector2f mouse_posf;
 
-    game->player.player_hit_box.setPosition(mouse_posf);
+        mouse_posf.x = ((int) game->controler.mouse_posi.x) - game->player.player_hit_box.getRadius();
+        mouse_posf.y = ((int) game->controler.mouse_posi.y) - game->player.player_hit_box.getRadius();
+
+        game->player.player_hit_box.setPosition(mouse_posf);
+
+    } else {
+
+        sf::Vector2f move(
+            game->controler.axisX / 2000,
+            game->controler.axisY / 2000
+        );
+
+        game->player.player_hit_box.setPosition(game->player.player_hit_box.getPosition() + move);
+
+    }
 
 }
 

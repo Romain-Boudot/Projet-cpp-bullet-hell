@@ -5,13 +5,14 @@ class Bullet_hell {
         int windowHeight; // hauteur de la fenetre de jeu
         int windowWidth; // largeur de la fenetre de jeu
         int framerate; // taux de rafraichissement du jeu
+
+        Controler controler;
         Player player; // class Player
         std::vector<Enemy> enemy; // tableau de class Enemy
-        sf::Vector2i mouse_posi;
         std::vector<Event> events;
 
         sf::Mutex mtx_event;
-        sf::Mutex mtx_pos_player;
+        sf::Mutex mtx_controler;
         sf::Mutex mtx_vect_enemy;
         sf::Mutex mtx_vect_player_bullet;
 
@@ -20,6 +21,7 @@ class Bullet_hell {
         bool isEnded();
         void end();
         void addEvent(int type, int code);
+        void addEvent(int type, int code, int value);
         int  placesLeft();
         void addEnemy(float x, float y, float mx, float my);
         int  weight();
@@ -50,9 +52,18 @@ Bullet_hell::Bullet_hell() {
 }
 
 
-void Bullet_hell::addEvent(int type, int code) {
+void Bullet_hell::addEvent(int type, int name) {
 
-    Event event(type, code);
+    Event event(type, name, 0);
+
+    this->events.push_back(event);
+
+}
+
+
+void Bullet_hell::addEvent(int type, int name, int value) {
+
+    Event event(type, name, value);
 
     this->events.push_back(event);
 
