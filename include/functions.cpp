@@ -39,8 +39,8 @@ void move(Bullet_hell *game) {
     } else {
 
         sf::Vector2f move(
-            game->controler.axisX / 2000,
-            game->controler.axisY / 2000
+            game->controler.axisX / 4000,
+            game->controler.axisY / 4000
         );
 
         game->player.player_hit_box.setPosition(game->player.player_hit_box.getPosition() + move);
