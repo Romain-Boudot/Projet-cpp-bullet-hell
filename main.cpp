@@ -232,8 +232,8 @@ void thread_player(Bullet_hell *game) {
 
         game->mtx_controler.lock();
             move(game); // mouvement du player
-            move_bullet(game); // mouvement des bullet
         game->mtx_controler.unlock();
+        move_bullet(game); // mouvement des bullet
 
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
             if (collision(game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5,
