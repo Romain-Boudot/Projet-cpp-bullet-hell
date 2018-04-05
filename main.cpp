@@ -4,6 +4,7 @@
 #include <vector>
 #include <math.h>
 #include <unistd.h>
+#include <sstream>
 
 #define PI 3.14159265 // nombre pi ... simplement
 #define WINDOW_HEIGHT 800 // taille de la fenetre (hauteur)
@@ -35,6 +36,11 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
     window.setFramerateLimit(FRAMERATE); // framerate
     //sf::Clock fps_clock;
     //float fps = 0, fps_tmp = 0;
+    sf::Font font;
+    font.loadFromFile("assets/Roboto-Regular.ttf");
+    sf::Text text("coucou", font, 30);
+    text.setColor(sf::Color::Magenta);
+    text.setPosition(0.f, 0.f);
 
     window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
@@ -96,6 +102,8 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
                 }
 
             }
+
+            text.setString(tostring(game->player.bullet_list.size()));
 
             game->mtx_event.unlock();
 
@@ -172,6 +180,8 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
         }
 
         game->mtx_vect_enemy_bullet.unlock();
+
+        window.draw(text);
 
         window.display();
 
