@@ -5,6 +5,7 @@ class Bullet {
         sf::RectangleShape bullet_hit_box;
 
         Bullet(float x, float y, float mx, float my);
+        Bullet(float x, float y, float mx, float my, float alpha);
 
         void move();
         bool out();
@@ -27,6 +28,7 @@ class Bullet {
  * 
  * detailles
  * 
+ * overloaded
  */
 
 Bullet::Bullet(float x, float y, float mx, float my) {
@@ -35,6 +37,33 @@ Bullet::Bullet(float x, float y, float mx, float my) {
 
     sf::RectangleShape r(size);
     r.setPosition(x, y);
+
+    this->bullet_hit_box = r;
+    this->mouvement.x = mx;
+    this->mouvement.y = my;
+
+}
+
+/*
+ * constructeur
+ * parametre :
+ *   float position en x
+ *   float position en y
+ *   float increment de mouvement x
+ *   float increment de mouvement y
+ * 
+ * detailles
+ * 
+ * overloaded
+ */
+
+Bullet::Bullet(float x, float y, float mx, float my, float alpha) {
+
+    sf::Vector2f size(4.f, 6.f);
+
+    sf::RectangleShape r(size);
+    r.setPosition(x, y);
+    r.setRotation(alpha);
 
     this->bullet_hit_box = r;
     this->mouvement.x = mx;

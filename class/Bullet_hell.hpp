@@ -6,10 +6,12 @@ class Bullet_hell {
         Player player; // class Player
         std::vector<Enemy> enemy; // tableau de class Enemy
         std::vector<Event> events;
+        std::vector<Bullet> enemy_bullet_list;
 
         sf::Mutex mtx_event;
         sf::Mutex mtx_controler;
         sf::Mutex mtx_vect_enemy;
+        sf::Mutex mtx_vect_enemy_bullet;
         sf::Mutex mtx_vect_player_bullet;
 
         sf::Vector2f corectif_hit_box_enemy;
@@ -49,13 +51,6 @@ Bullet_hell::Bullet_hell() {
     this->endb = false;
     this->max_weight = 10;
     this->dmgHit = 1;
-
-    this->corectif_hit_box_bullet_player.x = -2.f;
-    this->corectif_hit_box_bullet_player.y = -3.f;
-    this->corectif_hit_box_enemy.x = -10.f;
-    this->corectif_hit_box_enemy.y = -10.f;
-    this->corectif_hit_box_player.x = -5.f;
-    this->corectif_hit_box_player.y = -5.f;
 
     Player player;
 

@@ -39,7 +39,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
     window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
     while (window.isOpen()) {
-        
+
         sf::Event event;
 
         if (game->isEnded()) {
@@ -146,6 +146,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
             window.draw(game->enemy[cpt].enemy_circle);
             //window.draw(game->enemy[cpt].overcircle);
+            
 
         }
 
@@ -161,6 +162,16 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
         }
 
         game->mtx_vect_player_bullet.unlock();
+
+        game->mtx_vect_enemy_bullet.lock();
+
+        for (int cpt = 0; cpt < game->enemy_bullet_list.size(); cpt++) {
+
+            window.draw(game->enemy_bullet_list[cpt].bullet_hit_box);
+
+        }
+
+        game->mtx_vect_enemy_bullet.unlock();
 
         window.display();
 
@@ -264,6 +275,26 @@ void thread_enemy(Bullet_hell *game) {
     while(!game->isEnded()) {
 
         tickcounter(&tick_clock, &ticks);
+
+        if (ticks%5000 == 0) {
+
+            int rdn = random.getElapsedTime().asSeconds() * 1000;
+            rdn = rdn%(game->enemy.size());
+            
+            sf::Vector2f pos = game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f);
+            pos -= game->enemy[rdn].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f);
+            float alpha = (float) atan(((double) pos.x / pos.y));
+            pos.y = cos(alpha) / 100;
+            pos.x = sin(alpha) / 100;
+
+            game->mtx_vect_enemy_bullet.lock();
+
+            Bullet bullet = game->enemy[rdn].fire(pos.x, pos.y, alpha);
+            game->enemy_bullet_list.push_back(bullet);
+
+            game->mtx_vect_enemy_bullet.unlock();
+
+        }
 
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
 

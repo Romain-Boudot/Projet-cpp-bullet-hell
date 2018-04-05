@@ -13,7 +13,7 @@ class Enemy {
         Enemy(float x, float y, float mx, float my);
         void move();
         bool hit(int dmg);
-        void fire();
+        Bullet fire(float x, float y, float alpha);
         sf::Vector2f get_pos();
         int get_radius();
 
@@ -119,14 +119,14 @@ bool Enemy::hit(int dmg) {
  *
  * retourne void
  * 
- * ajoute une balle dans la liste des tires (dans la class de jeu) (une liste pour toute les balles ennemis c'est plus opti)
+ * ajoute une balle dans la liste des tires
  * 
  */
 
-void Enemy::fire() {
+Bullet Enemy::fire(float x, float y, float alpha) {
 
-    Bullet bullet = Bullet(this->enemy_circle.getPosition().x, this->enemy_circle.getPosition().y, 0.f, 0.001f);
-    this->bulletList.push_back(bullet);
+    Bullet bullet = Bullet(this->enemy_circle.getPosition().x, this->enemy_circle.getPosition().y, x, y, alpha);
+    return bullet;
 
 }
 

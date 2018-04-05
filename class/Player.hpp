@@ -26,7 +26,7 @@ class Player {
 Player::Player() {
 
     sf::CircleShape player_hit_box(5.f,20);
-    player_hit_box.setFillColor(sf::Color::Green);
+    player_hit_box.setFillColor(sf::Color::Magenta);
     player_hit_box.setPosition(250.f, 400.f);
 
     this->player_hit_box = player_hit_box;

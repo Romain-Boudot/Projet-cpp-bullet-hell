@@ -67,16 +67,12 @@ void move_bullet(Bullet_hell *game) {
 
     }
 
-    for (int cpt1 = 0; cpt1 < game->enemy.size(); cpt1++) {
+    for (int cpt = 0; cpt < game->enemy_bullet_list.size(); cpt++) {
 
-       for (int cpt = 0; cpt < game->enemy[cpt1].bulletList.size(); cpt++) {
+        game->enemy_bullet_list[cpt].move();
 
-            game->enemy[cpt1].bulletList[cpt].move();
-
-            if (game->enemy[cpt1].bulletList[cpt].out()) {
-                game->enemy[cpt1].bulletList.erase(game->enemy[cpt1].bulletList.begin() + cpt);
-            }
-
+        if (game->enemy_bullet_list[cpt].out()) {
+            game->enemy_bullet_list.erase(game->enemy_bullet_list.begin() + cpt);
         }
 
     }
