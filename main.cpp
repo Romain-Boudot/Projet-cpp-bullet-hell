@@ -4,19 +4,35 @@
 #include <vector>
 #include <math.h>
 #include <unistd.h>
+
+#define PI 3.14159265 // nombre pi ... simplement
+#define WINDOW_HEIGHT 800 // taille de la fenetre (hauteur)
+#define WINDOW_WIDTH 500 // taille de la fenetre (largeur)
+#define FRAMERATE 90 // image par second (max)
+#define ENEMY_MOVEMENT_DEC 0.99998 // multiplicateur pour la ralentissement des ennemis
+#define ENEMY_MOVEMENT_INC 1.00003 // multiplicateur pour l'acceleration des ennemis
+
 #include "class/Event.hpp"
 #include "class/Controler.hpp"
-#include "class/Game_event.hpp"
-#include "class/Enemy.hpp"
 #include "class/Bullet.hpp"
+#include "class/Enemy.hpp"
 #include "class/Player.hpp"
 #include "class/Bullet_hell.hpp"
 #include "include/functions.cpp"
 
+/*
+ * Thread d'affichage
+ * parametre :
+ *   Bullet_hell // class de jeu
+ * 
+ * retourne rien
+ * 
+ */
+
 void thread_aff(Bullet_hell *game) { // thread d'affichage
 
-    sf::RenderWindow window(sf::VideoMode(game->windowWidth, game->windowHeight), "Bullet Hell");
-    window.setFramerateLimit(game->framerate); // framerate
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bullet Hell");
+    window.setFramerateLimit(FRAMERATE); // framerate
     //sf::Clock fps_clock;
     //float fps = 0, fps_tmp = 0;
 
@@ -25,6 +41,10 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
     while (window.isOpen()) {
         
         sf::Event event;
+
+        if (game->isEnded()) {
+            window.close();
+        }
 
         while (window.pollEvent(event)) {
 
@@ -46,17 +66,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
                 }
             }
 
-            game->mtx_event.unlock();
             game->mtx_controler.lock();
-
-            if (event.type == sf::Event::MouseMoved) {
-                
-                if (game->controler.joy != 0) game->controler.joy = 0;
-
-                game->controler.mouse_posi.x = event.mouseMove.x;
-                game->controler.mouse_posi.y = event.mouseMove.y;
-
-            }
 
             if (event.type == sf::Event::JoystickMoved) {
 
@@ -64,31 +74,78 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
                 if (event.joystickMove.axis == sf::Joystick::X) {
                     game->controler.axisX = event.joystickMove.position;
-                } else if (event.joystickMove.axis == sf::Joystick::Y) {
+                }
+                if (event.joystickMove.axis == sf::Joystick::Y) {
                     game->controler.axisY = event.joystickMove.position;
-                } else if (event.joystickMove.axis == sf::Joystick::R) {
+                }
+                if (event.joystickMove.axis == sf::Joystick::R) {
                     if (event.joystickMove.position < -95) {
                         game->addEvent(0, 2);
                     } else {
                         game->addEvent(0, 1);
                     }
                 }
+                if (event.joystickMove.axis == sf::Joystick::PovY) {
+                    if (event.joystickMove.position == 100) {
+                        sf::Vector2f correctif;
+                        correctif.x = -game->controler.axisX;
+                        correctif.y = -game->controler.axisY;                        
+                        game->controler.correctif = correctif;
+                    }
+
+                }
 
             }
-    
+
+            game->mtx_event.unlock();
+
+            if (event.type == sf::Event::KeyPressed) {
+
+                if (game->controler.joy == true) game->controler.joy = false;
+
+                if (event.key.code == sf::Keyboard::Up) {
+                    game->controler.keyDir.y = -1;
+                } else if (event.key.code == sf::Keyboard::Down) {
+                    game->controler.keyDir.y = 1;
+                } else if (event.key.code == sf::Keyboard::Right) {
+                    game->controler.keyDir.x = 1;
+                } else if (event.key.code == sf::Keyboard::Left) {
+                    game->controler.keyDir.x = -1;
+                }
+
+            }
+
+            if (event.type == sf::Event::KeyReleased) {
+                
+                if (event.key.code == sf::Keyboard::Up) {
+                    game->controler.keyDir.y = 0;
+                } else if (event.key.code == sf::Keyboard::Down) {
+                    game->controler.keyDir.y = 0;
+                } else if (event.key.code == sf::Keyboard::Right) {
+                    game->controler.keyDir.x = 0;
+                } else if (event.key.code == sf::Keyboard::Left) {
+                    game->controler.keyDir.x = 0;
+                }
+            
+            }
+
+            game->controler.shiftKey = event.key.shift;
+
             game->mtx_controler.unlock();
             
         }
 
+        
+
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player.player_hit_box);
-
 
         game->mtx_vect_enemy.lock();
 
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
 
             window.draw(game->enemy[cpt].enemy_circle);
+            //window.draw(game->enemy[cpt].overcircle);
 
         }
 
@@ -112,6 +169,23 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
     game->end();
 
 }
+
+
+/*
+ * Thread du player
+ * parametre :
+ *   Bullet_hell // class de jeu
+ * 
+ * retourne rien
+ * 
+ * gestion du joueur :
+ *   evenement de tire
+ *   mouvement du joueur
+ *   mouvement des balles (joueur + ennemie) // optimisation de la répartition des taches entre thread
+ *   check de collision entre le joueur et les entitées ennemis
+ * 
+ */
+
 
 void thread_player(Bullet_hell *game) {
 
@@ -150,18 +224,42 @@ void thread_player(Bullet_hell *game) {
             move_bullet(game); // mouvement des bullet
         game->mtx_controler.unlock();
 
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+            if (collision(game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5,
+            game->enemy[cpt].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f), 10)) {
+                game->end();
+            }
+        }
+
     }
 
 }
 
+
+/*
+ * Thread des ennemis
+ * parametre :
+ *   Bullet_hell // class de jeu
+ * 
+ * retourne rien
+ * 
+ * gestion des ennemis:
+ *   mouvements des ennemis
+ *   gestion des ennemis hors fenetre (kill)
+ *   check de collision balles (player) ennemis
+ *   gestion des hit ennemis
+ *   mort des ennemis
+ *   respawn des ennemis
+ *   gestion de la balance du jeu (nombre d'ennemis sur le plateau en fonction de leur poids)
+ * 
+ */
+
+
 void thread_enemy(Bullet_hell *game) {
 
-    int event, ticks = 0, pl;
+    int event, ticks = 0;
     sf::Clock tick_clock;
     sf::Clock random;
-
-    sf::Vector2f corectif_hit_box_enemy(-10.f, -10.f);
-    sf::Vector2f corectif_hit_box_bullet_player(-2.f, -3.f);
 
     while(!game->isEnded()) {
 
@@ -177,10 +275,8 @@ void thread_enemy(Bullet_hell *game) {
             
             for (int cpt1 = 0; cpt1 < game->player.bullet_list.size(); cpt1++) {
 
-                if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition() + corectif_hit_box_enemy, 
-                    game->player.bullet_list[cpt1].radiusHit, 
-                    game->enemy[cpt].enemy_circle.getPosition() + corectif_hit_box_bullet_player, 
-                    game->enemy[cpt].radiusHit ))
+                if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition() + sf::Vector2f(2.f, 3.f), 2,
+                game->enemy[cpt].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f), 10))
                 {
                     game->hitEnemy(cpt);
                     game->killPlayerBullet(cpt1);
@@ -190,23 +286,38 @@ void thread_enemy(Bullet_hell *game) {
 
         }
 
-        if (game->placesLeft() > 0 and ticks%200 == 0) {
+        if (game->placesLeft() > 0 and ticks%2000 == 0) {
 
             game->addEnemy(
-                (int)(random.getElapsedTime().asSeconds() * 1000)%500,
+                ((int) (random.getElapsedTime().asSeconds() * 1000)%460) + 20,
                 1.f,
-                ((int)random.getElapsedTime().asSeconds() * 1000)%100 / 100,
+                0.f,
                 0.005f
             );
 
         }
 
-        /* system("clear");
-        std::cout << "perf  : " << tick_clock.getElapsedTime().asSeconds() << std::endl; */
-
     }
 
 }
+
+
+/*
+ * Main thread
+ * 
+ * retourne int
+ * 
+ * gestion des thread:
+ *   lancement thread player
+ *   lancement thread ennemis
+ *   lancement thread affichage
+ * 
+ *   attente du thread d'affichage
+ *   attente du thread ennemis
+ *   attente du thread player
+ * 
+ */
+
 
 int main() {    
 

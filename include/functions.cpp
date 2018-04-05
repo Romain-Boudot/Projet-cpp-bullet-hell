@@ -29,18 +29,23 @@ void move(Bullet_hell *game) {
 
     if (game->controler.joy == false) {
 
-        sf::Vector2f mouse_posf;
+        sf::Vector2f pos = game->player.player_hit_box.getPosition();
+        
+        if (game->controler.shiftKey) {
+            pos.x += (float) game->controler.keyDir.x / 180;
+            pos.y += (float) game->controler.keyDir.y / 180;
+        } else {
+            pos.x += (float) game->controler.keyDir.x / 80;
+            pos.y += (float) game->controler.keyDir.y / 80;
+        }
 
-        mouse_posf.x = ((int) game->controler.mouse_posi.x) - game->player.player_hit_box.getRadius();
-        mouse_posf.y = ((int) game->controler.mouse_posi.y) - game->player.player_hit_box.getRadius();
-
-        game->player.player_hit_box.setPosition(mouse_posf);
+        game->player.player_hit_box.setPosition(pos);
 
     } else {
 
         sf::Vector2f move(
-            game->controler.axisX / 4000,
-            game->controler.axisY / 4000
+            (game->controler.axisX + game->controler.correctif.x) / 4000,
+            (game->controler.axisY + game->controler.correctif.y) / 4000
         );
 
         game->player.player_hit_box.setPosition(game->player.player_hit_box.getPosition() + move);
@@ -56,13 +61,28 @@ void move_bullet(Bullet_hell *game) {
 
         game->player.bullet_list[cpt].move();
 
-        if (game->player.bullet_list[cpt].bullet_hit_box.getPosition().y < -10) {
+        if (game->player.bullet_list[cpt].out()) {
             game->player.bullet_list.erase(game->player.bullet_list.begin() + cpt);
         }
 
     }
 
+    for (int cpt1 = 0; cpt1 < game->enemy.size(); cpt1++) {
+
+       for (int cpt = 0; cpt < game->enemy[cpt1].bulletList.size(); cpt++) {
+
+            game->enemy[cpt1].bulletList[cpt].move();
+
+            if (game->enemy[cpt1].bulletList[cpt].out()) {
+                game->enemy[cpt1].bulletList.erase(game->enemy[cpt1].bulletList.begin() + cpt);
+            }
+
+        }
+
+    }
+
 }
+
 
 bool collision(sf::Vector2f pos1, int rad1, sf::Vector2f pos2, int rad2) {
 
