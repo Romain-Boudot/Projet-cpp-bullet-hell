@@ -245,13 +245,6 @@ void thread_player(Bullet_hell *game) {
             move_bullet(game); // mouvement des bullet
         game->mtx_controler.unlock();
 
-        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
-            if (collision(game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5,
-            game->enemy[cpt].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f), 10)) {
-                game->end();
-            }
-        }
-
     }
 
 }
@@ -314,6 +307,49 @@ void thread_enemy(Bullet_hell *game) {
                 game->enemy.erase(game->enemy.begin() + cpt);
             }
             
+            // old check collision player bullet ennemi
+
+        }
+
+        if (game->placesLeft() > 0 and ticks%2000 == 0) {
+
+            game->addEnemy(
+                ((int) (random.getElapsedTime().asSeconds() * 1000)%460) + 20,
+                1.f,
+                0.f,
+                0.005f
+            );
+
+        }
+
+    }
+
+}
+
+
+void thread_collision(Bullet_hell *game) {
+
+    int ticks = 0;
+    sf::Clock tick_clock;
+
+    while(!game->isEnded()) {
+
+        // tick counter
+        tickcounter(&tick_clock, &ticks);
+
+        // check collision player / ennemi
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+            if (collision(game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5,
+            game->enemy[cpt].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f), 10)) {
+
+                game->end();
+            
+            }
+        }
+
+        // check collision bullet player / ennemi
+        for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
+            
             for (int cpt1 = 0; cpt1 < game->player.bullet_list.size(); cpt1++) {
 
                 if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition() + sf::Vector2f(2.f, 3.f), 2,
@@ -327,14 +363,15 @@ void thread_enemy(Bullet_hell *game) {
 
         }
 
-        if (game->placesLeft() > 0 and ticks%2000 == 0) {
+        // check collision bullet ennemis / player
+        for (int cpt = 0; cpt < game->enemy_bullet_list.size(); cpt++) {
 
-            game->addEnemy(
-                ((int) (random.getElapsedTime().asSeconds() * 1000)%460) + 20,
-                1.f,
-                0.f,
-                0.005f
-            );
+            if (collision(game->enemy_bullet_list[cpt].bullet_hit_box.getPosition() + sf::Vector2f(2.f, 3.f), 2,
+            game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5)) {
+
+                game->end();
+
+            }
 
         }
 
@@ -367,11 +404,14 @@ int main() {
     sf::Thread th_aff(&thread_aff, &game);
     sf::Thread th_player(&thread_player, &game);
     sf::Thread th_enemy(&thread_enemy, &game);
+    sf::Thread th_coll(&thread_collision, &game);
 
     th_player.launch();
     th_enemy.launch();
     th_aff.launch();
+    th_coll.launch();
 
+    th_coll.wait();
     th_aff.wait();
     th_enemy.wait();
     th_player.wait();
