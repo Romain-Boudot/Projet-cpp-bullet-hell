@@ -29,3 +29,11 @@ a certain pallier : boss
    - [ ] choix des boutons
   - [ ] clavier :
    - [ ] choix des boutons
+
+
+
+   affichage prend M1
+   player prend M2
+   enenmi prend M3
+
+   

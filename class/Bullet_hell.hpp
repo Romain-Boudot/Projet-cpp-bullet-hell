@@ -14,6 +14,10 @@ class Bullet_hell {
         sf::Mutex mtx_vect_enemy_bullet;
         sf::Mutex mtx_vect_player_bullet;
 
+        sf::Mutex mtx_M1_synchro;
+        sf::Mutex mtx_M2_synchro;
+        sf::Mutex mtx_M3_synchro;
+
         sf::Vector2f corectif_hit_box_enemy;
         sf::Vector2f corectif_hit_box_bullet_player;
         sf::Vector2f corectif_hit_box_player;
