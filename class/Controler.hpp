@@ -5,6 +5,7 @@ class Controler {
         bool joy;
         sf::Vector2i keyDir;
         sf::Vector2f correctif;
+        sf::Vector2f deadzone;
         bool shiftKey;
         float axisX; // vertical move
         float axisY; // horizontal move
@@ -44,5 +45,7 @@ Controler::Controler() {
     this->axisV = 0;
     this->axisPOVX = 0;
     this->axisPOVY = 0;
+    this->deadzone.x = 10;
+    this->deadzone.y = 10;
     
 }

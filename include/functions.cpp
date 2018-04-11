@@ -48,9 +48,28 @@ void move(Bullet_hell *game) {
     } else {
 
         sf::Vector2f move(
-            (game->controler.axisX + game->controler.correctif.x) / 4000,
-            (game->controler.axisY + game->controler.correctif.y) / 4000
+            (game->controler.axisX + game->controler.correctif.x),
+            (game->controler.axisY + game->controler.correctif.y)
         );
+
+        if (move.x < 0) {
+            move.x += game->controler.deadzone.x;
+            if (move.x > 0) move.x = 0;
+        } else {
+            move.x -= game->controler.deadzone.x;
+            if (move.x < 0) move.x = 0;
+        }
+
+        if (move.y < 0) {
+            move.y += game->controler.deadzone.y;
+            if (move.y > 0) move.y = 0;
+        } else {
+            move.y -= game->controler.deadzone.y;
+            if (move.y < 0) move.y = 0;
+        }
+
+        move.x /= 4000;
+        move.y /= 4000;
 
         sf::Vector2f pos(game->player.player_hit_box.getPosition() + move);
 
@@ -105,6 +124,18 @@ std::string tostring(int score) {
     std::stringstream ss;
 
     ss << score;
+
+    std::string sService = ss.str();
+
+    return sService;
+
+}
+
+std::string tostring(Bullet_hell *game) {
+
+    std::stringstream ss;
+
+    ss << game->controler.axisX << " / " << game->controler.axisY;
 
     std::string sService = ss.str();
 

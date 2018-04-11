@@ -110,7 +110,9 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
             }
 
-            text.setString(tostring((int) (game->get_killed_enemy() * (game_clock.getElapsedTime().asSeconds() + 1))));
+            text.setString(tostring(game));
+
+            // (int) (game->get_killed_enemy() * (game_clock.getElapsedTime().asSeconds() + 1))
 
             game->mtx_event.unlock();
 
@@ -149,8 +151,6 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
             game->mtx_controler.unlock();
             
         }
-
-        
 
         window.clear(sf::Color(0, 0, 30, 200));
         window.draw(game->player.player_hit_box);
