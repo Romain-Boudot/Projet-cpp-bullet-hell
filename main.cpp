@@ -40,7 +40,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
     sf::Text text("coucou", font, 30);
     text.setColor(sf::Color::Magenta);
     text.setPosition(0.f, 0.f);
-     sf::Clock game_clock;
+    sf::Clock game_clock;
 
     window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
@@ -49,6 +49,13 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
         sf::Event event;
 
         if (game->isEnded()) {
+            sf::Clock waiter;
+            sf::Text game_over("GAME OVER", font, 30);
+            game_over.setColor(sf::Color::Magenta);
+            game_over.setPosition(170.f, 20.f);
+            window.draw(game_over);
+            window.display();
+            while (waiter.getElapsedTime().asSeconds() < 5) { /* waiting */ }
             window.close();
         }
 

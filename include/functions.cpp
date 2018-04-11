@@ -39,7 +39,11 @@ void move(Bullet_hell *game) {
             pos.y += (float) game->controler.keyDir.y / 80;
         }
 
-        game->player.player_hit_box.setPosition(pos);
+        if (pos.x > 490 || pos.x < 0 || pos.y > 790 || pos.y < 0) {
+            // sort de l'ecran
+        } else {
+            game->player.player_hit_box.setPosition(pos);
+        }
 
     } else {
 
@@ -48,7 +52,13 @@ void move(Bullet_hell *game) {
             (game->controler.axisY + game->controler.correctif.y) / 4000
         );
 
-        game->player.player_hit_box.setPosition(game->player.player_hit_box.getPosition() + move);
+        sf::Vector2f pos(game->player.player_hit_box.getPosition() + move);
+
+        if (pos.x > 490 || pos.x < 0 || pos.y > 790 || pos.y < 0) {
+            // sort de l'ecran
+        } else {
+            game->player.player_hit_box.setPosition(pos);
+        }
 
     }
 
