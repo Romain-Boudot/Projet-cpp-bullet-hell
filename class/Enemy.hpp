@@ -150,7 +150,7 @@ bool Enemy::hit(int dmg) {
 
 Bullet Enemy::fire(float x, float y, float alpha) {
 
-    Bullet bullet = Bullet(this->enemy_circle.getPosition().x, this->enemy_circle.getPosition().y, x, y, alpha);
+    Bullet bullet = Bullet(this->enemy_circle.getPosition().x, this->enemy_circle.getPosition().y, x, y);
     return bullet;
 
 }

@@ -2,7 +2,7 @@ class Bullet {
 
     public:
 
-        sf::RectangleShape bullet_hit_box;
+        sf::CircleShape bullet_hit_box;
 
         Bullet(float x, float y, float mx, float my);
         Bullet(float x, float y, float mx, float my, float alpha);
@@ -33,9 +33,7 @@ class Bullet {
 
 Bullet::Bullet(float x, float y, float mx, float my) {
 
-    sf::Vector2f size(4.f, 6.f);
-
-    sf::RectangleShape r(size);
+    sf::CircleShape r(2.f, 10);
     r.setPosition(x, y);
 
     this->bullet_hit_box = r;
@@ -56,20 +54,6 @@ Bullet::Bullet(float x, float y, float mx, float my) {
  * 
  * overloaded
  */
-
-Bullet::Bullet(float x, float y, float mx, float my, float alpha) {
-
-    sf::Vector2f size(4.f, 6.f);
-
-    sf::RectangleShape r(size);
-    r.setPosition(x, y);
-    r.setRotation(alpha);
-
-    this->bullet_hit_box = r;
-    this->mouvement.x = mx;
-    this->mouvement.y = my;
-
-}
 
 /*
  * fait bouger l'entitée
