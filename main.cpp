@@ -274,6 +274,8 @@ void thread_enemy(Bullet_hell *game) {
     sf::Clock tick_clock;
     sf::Clock random;
 
+    while (random.getElapsedTime().asSeconds() < 3) { /* waiting */ }
+
     while(!game->isEnded()) {
 
         tickcounter(&tick_clock, &ticks);
@@ -361,6 +363,9 @@ void thread_collision(Bullet_hell *game) {
                 {
                     if (game->hitEnemy(cpt)) {
                         game->inc_killed_enemy();
+                        if (game->get_killed_enemy()%5 == 0) {
+                            game->inc_max_weight();
+                        }
                     }
                     game->killPlayerBullet(cpt1);
                 }
