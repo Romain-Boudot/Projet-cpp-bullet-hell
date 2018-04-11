@@ -1,9 +1,0 @@
-class Calculator {
-
-    public:
-
-    private:
-
-        
-
-};

@@ -16,6 +16,7 @@ class Enemy {
         Bullet fire(float x, float y, float alpha);
         sf::Vector2f get_pos();
         int get_radius();
+        void rotation(float alpha);
 
     private:
 
@@ -41,7 +42,7 @@ class Enemy {
 
 Enemy::Enemy(float x, float y, float mx, float my) {
 
-    sf::CircleShape enemy(10.f,15);
+    sf::CircleShape enemy(10.f,7);
     //sf::CircleShape overcircle(10.f,5);
     enemy.setFillColor(sf::Color::Red);
     //overcircle.setFillColor(sf::Color::Red);
@@ -60,6 +61,30 @@ Enemy::Enemy(float x, float y, float mx, float my) {
     this->inertie = ENEMY_MOVEMENT_DEC;
 
 }
+
+
+void Enemy::rotation(float offset) { // dead
+
+    float init_angle = this->enemy_circle.getRotation();
+    float alpha = init_angle + offset;
+
+    std::cout << this->enemy_circle.getRotation() << " / ";
+
+    this->enemy_circle.setRotation(alpha);
+
+    std::cout << this->enemy_circle.getRotation() << std::endl;
+
+    sf::Vector2f pos;
+
+    pos.y = (sin(alpha) - sin(alpha)) * 14.1421356;
+    pos.x = (cos(alpha) - cos(alpha)) * 14.1421356;
+
+    std::cout << pos.x << " / " << pos.y << std::endl;
+
+    this->enemy_circle.setPosition(this->enemy_circle.getPosition() + pos);
+
+}
+
 
 /*
  * fait bouger l'entité

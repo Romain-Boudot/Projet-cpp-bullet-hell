@@ -32,13 +32,18 @@ class Bullet_hell {
         void addEnemy(float x, float y, float mx, float my);
         int  weight();
         void killPlayerBullet(int indice);
-        void hitEnemy(int indice);
+        bool hitEnemy(int indice);
+        int  get_killed_enemy();
+        void inc_killed_enemy();
+        int  get_max_weight();
+        void inc_max_weight();
 
     private:
 
         bool endb;
         int max_weight;
         int dmgHit;
+        int killed_enemy;
 
 };
 
@@ -53,7 +58,7 @@ class Bullet_hell {
 Bullet_hell::Bullet_hell() {
 
     this->endb = false;
-    this->max_weight = 10;
+    this->max_weight = 5;
     this->dmgHit = 1;
 
     Player player;
@@ -224,7 +229,7 @@ void Bullet_hell::killPlayerBullet(int indice) {
  * 
  */
 
-void Bullet_hell::hitEnemy(int indice) {
+bool Bullet_hell::hitEnemy(int indice) {
 
     if (this->enemy[indice].hit(this->dmgHit)) {
 
@@ -232,6 +237,34 @@ void Bullet_hell::hitEnemy(int indice) {
         this->enemy.erase(this->enemy.begin() + indice);
         this->mtx_vect_enemy.unlock();
 
+        return true;
+
     }
+
+    return false;
+
+}
+
+int Bullet_hell::get_killed_enemy() {
+
+    return this->killed_enemy;
+
+}
+
+void Bullet_hell::inc_killed_enemy() {
+
+    this->killed_enemy += 1;
+
+}
+
+int Bullet_hell::get_max_weight() {
+
+    return this->max_weight;
+
+}
+
+void Bullet_hell::inc_max_weight(){
+
+    this->max_weight += 1;
 
 }

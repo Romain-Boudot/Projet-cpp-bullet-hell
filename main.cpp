@@ -12,6 +12,7 @@
 #define FRAMERATE 90 // image par second (max)
 #define ENEMY_MOVEMENT_DEC 0.99998 // multiplicateur pour la ralentissement des ennemis
 #define ENEMY_MOVEMENT_INC 1.00003 // multiplicateur pour l'acceleration des ennemis
+#define DEBUG 0
 
 #include "class/Event.hpp"
 #include "class/Controler.hpp"
@@ -34,13 +35,12 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Bullet Hell");
     window.setFramerateLimit(FRAMERATE); // framerate
-    //sf::Clock fps_clock;
-    //float fps = 0, fps_tmp = 0;
     sf::Font font;
     font.loadFromFile("assets/Roboto-Regular.ttf");
     sf::Text text("coucou", font, 30);
     text.setColor(sf::Color::Magenta);
     text.setPosition(0.f, 0.f);
+     sf::Clock game_clock;
 
     window.setMouseCursorVisible(false); // pas de pointeur en jeu
 
@@ -103,7 +103,7 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
 
             }
 
-            text.setString(tostring(game->player.bullet_list.size()));
+            text.setString(tostring((int) (game->get_killed_enemy() * (game_clock.getElapsedTime().asSeconds() + 1))));
 
             game->mtx_event.unlock();
 
@@ -155,7 +155,6 @@ void thread_aff(Bullet_hell *game) { // thread d'affichage
             window.draw(game->enemy[cpt].enemy_circle);
             //window.draw(game->enemy[cpt].overcircle);
             
-
         }
 
         game->mtx_vect_enemy.unlock();
@@ -279,11 +278,11 @@ void thread_enemy(Bullet_hell *game) {
 
         tickcounter(&tick_clock, &ticks);
 
-        if (ticks%5000 == 0) {
+        if (ticks%(5000 - (game->get_killed_enemy() * 10)) == 0 && game->enemy.size() != 0) {
 
             int rdn = random.getElapsedTime().asSeconds() * 1000;
             rdn = rdn%(game->enemy.size());
-            
+
             sf::Vector2f pos = game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f);
             pos -= game->enemy[rdn].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f);
             float alpha = (float) atan(((double) pos.x / pos.y));
@@ -299,14 +298,19 @@ void thread_enemy(Bullet_hell *game) {
 
         }
 
+        game->mtx_vect_enemy.lock();
+
         for (int cpt = 0; cpt < game->enemy.size(); cpt++) {
 
+        
             game->enemy[cpt].move();
+
+            // game->enemy[cpt].rotation(0.01); dead
             
             if (game->enemy[cpt].enemy_circle.getPosition().y > 800) {
                 game->enemy.erase(game->enemy.begin() + cpt);
             }
-            
+
             // old check collision player bullet ennemi
 
         }
@@ -315,12 +319,12 @@ void thread_enemy(Bullet_hell *game) {
 
             game->addEnemy(
                 ((int) (random.getElapsedTime().asSeconds() * 1000)%460) + 20,
-                1.f,
-                0.f,
-                0.005f
+                1.f, 0.f, 0.005f
             );
 
         }
+
+        game->mtx_vect_enemy.unlock();
 
     }
 
@@ -355,7 +359,9 @@ void thread_collision(Bullet_hell *game) {
                 if (collision(game->player.bullet_list[cpt1].bullet_hit_box.getPosition() + sf::Vector2f(2.f, 3.f), 2,
                 game->enemy[cpt].enemy_circle.getPosition() + sf::Vector2f(10.f, 10.f), 10))
                 {
-                    game->hitEnemy(cpt);
+                    if (game->hitEnemy(cpt)) {
+                        game->inc_killed_enemy();
+                    }
                     game->killPlayerBullet(cpt1);
                 }
 
@@ -368,9 +374,7 @@ void thread_collision(Bullet_hell *game) {
 
             if (collision(game->enemy_bullet_list[cpt].bullet_hit_box.getPosition() + sf::Vector2f(2.f, 3.f), 2,
             game->player.player_hit_box.getPosition() + sf::Vector2f(5.f, 5.f), 5)) {
-
                 game->end();
-
             }
 
         }

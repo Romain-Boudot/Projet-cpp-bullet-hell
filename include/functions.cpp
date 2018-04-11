@@ -90,11 +90,11 @@ bool collision(sf::Vector2f pos1, int rad1, sf::Vector2f pos2, int rad2) {
 
 }
 
-std::string tostring(size_t size) {
+std::string tostring(int score) {
 
     std::stringstream ss;
 
-    ss << size;
+    ss << score;
 
     std::string sService = ss.str();
 
