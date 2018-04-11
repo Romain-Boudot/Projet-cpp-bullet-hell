@@ -14,6 +14,8 @@
 #define ENEMY_MOVEMENT_INC 1.00003 // multiplicateur pour l'acceleration des ennemis
 #define DEBUG 0
 
+#include "class/Background.hpp"
+#include "class/Menu.hpp"
 #include "class/Event.hpp"
 #include "class/Controler.hpp"
 #include "class/Bullet.hpp"
@@ -413,24 +415,47 @@ void thread_collision(Bullet_hell *game) {
  */
 
 
-int main() {    
+int main() {
 
-    Bullet_hell game;
+    bool end = false;
+    bool play;
 
-    sf::Thread th_aff(&thread_aff, &game);
-    sf::Thread th_player(&thread_player, &game);
-    sf::Thread th_enemy(&thread_enemy, &game);
-    sf::Thread th_coll(&thread_collision, &game);
+    while(end == false) {
 
-    th_player.launch();
-    th_enemy.launch();
-    th_aff.launch();
-    th_coll.launch();
+        play = menu();
 
-    th_coll.wait();
-    th_aff.wait();
-    th_enemy.wait();
-    th_player.wait();
+        if (play == true) {
+
+            std::cout << "je joue" << std::endl;
+
+            Bullet_hell game;
+
+            sf::Thread th_aff(&thread_aff, &game);
+            sf::Thread th_player(&thread_player, &game);
+            sf::Thread th_enemy(&thread_enemy, &game);
+            sf::Thread th_coll(&thread_collision, &game);
+
+            th_player.launch();
+            th_enemy.launch();
+            th_aff.launch();
+            th_coll.launch();
+
+            th_coll.wait();
+            th_aff.wait();
+            th_enemy.wait();
+            th_player.wait();
+
+        } else {
+            
+            std::cout << "je joue plus" << std::endl;
+
+            end = true;
+
+        }
+
+    }
+
+    std::cout << "je suis sorti" << std::endl;
 
     return 0;
 

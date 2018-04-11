@@ -31,6 +31,7 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "cmath": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "sstream": "cpp"
     }
 }

@@ -142,3 +142,126 @@ std::string tostring(Bullet_hell *game) {
     return sService;
 
 }
+
+bool menu() {
+
+    std::cout << "je rentre dans le menu" << std::endl;
+
+    sf::RenderWindow window;
+
+    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Menu");
+    window.setFramerateLimit(FRAMERATE);
+    //window.setVerticalSyncEnabled(true);
+
+    Menu menu(window.getSize().x, window.getSize().y);
+
+    int show = 5;
+    Background Background;
+    bool play = false;
+    bool key_pressed = false;
+
+    while (play == false && window.isOpen()) {
+
+        sf::Event event;
+
+        //std::cout << menu.GetPressedItem() << std::endl;
+
+        while(window.pollEvent(event)) {
+
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            if (event.key.code == sf::Keyboard::Escape) {
+                if (show == 5) {
+                    window.close();
+                } else {
+                    show = 5;
+                    menu.SetPressedItem(0);
+                }
+            }
+
+            if (event.type == sf::Event::KeyPressed) {
+
+                if (show == 5) {
+
+                    if (key_pressed == false) { 
+
+                        key_pressed = true;
+
+                        if (event.key.code == sf::Keyboard::Up) {
+                            menu.MoveUp();
+                        } else if (event.key.code == sf::Keyboard::Down) {
+                            if (menu.GetPressedItem() != 2) {
+                                menu.MoveDown();
+                            }
+                        } else if (event.key.code == sf::Keyboard::Return) {
+
+                            if (menu.GetPressedItem() == 0) {
+                                play = true;
+                            } else if (menu.GetPressedItem() == 1) {
+                                show = 2;
+                                menu.SetPressedItem(3);
+                            } else if (menu.GetPressedItem() == 2) {
+                                window.close();
+                            }
+
+                        }
+
+                    }
+
+                } else if (show == 2) {
+
+                    if (key_pressed == false) {
+
+                        key_pressed = true;
+
+                        if (event.key.code == sf::Keyboard::Up) {
+                            if (menu.GetPressedItem() != 3) {
+                                menu.MoveUp();
+                            }
+                        } else if (event.key.code == sf::Keyboard::Down) {
+                            menu.MoveDown();
+                        } else if (event.key.code == sf::Keyboard::Return) {
+
+                            if (menu.GetPressedItem() == 5) {
+                                show = 5;
+                                menu.SetPressedItem(0);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            } else if (event.type == sf::Event::KeyReleased) {
+                    
+                key_pressed = false;
+
+            }
+
+        }
+
+
+        if (show == 2) {
+            
+            window.clear();
+            Background.drawBackground(window);
+            menu.drawOptions(window);
+            window.display();
+
+        } else if (show == 5) {
+
+            window.clear();
+            Background.drawBackground(window);
+            menu.draw(window);
+            window.display();
+
+        }
+
+    }
+
+    return play;
+ 
+}
